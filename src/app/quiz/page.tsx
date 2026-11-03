@@ -1,14 +1,15 @@
 import type { Metadata } from "next";
-import { ComingSoon } from "@/components/coming-soon";
+import { QuizGame } from "./quiz-game";
 
 export const metadata: Metadata = { title: "이름 맞추기 퀴즈" };
 
-export default function QuizPage() {
+export default async function QuizPage({ searchParams }: { searchParams: Promise<{ type?: string }> }) {
+  const { type } = await searchParams;
   return (
-    <ComingSoon
-      title="이름 맞추기 퀴즈"
-      summary="실루엣이나 일러스트를 보고 니케 이름을 맞춥니다."
-      features={["쉬움: 4지선다", "어려움: 이름 직접 입력, 자동완성 지원", "로그인하면 점수와 기록을 계정에 저장"]}
-    />
+    <main className="mx-auto max-w-[1400px] px-4 pt-10 pb-16 md:px-10 md:pt-16">
+      <h1 className="text-[2rem] leading-tight font-black tracking-[-0.03em] md:text-5xl">이름 맞추기 퀴즈</h1>
+      <p className="mt-3 max-w-[56ch] text-ink-2 md:text-lg">실루엣이나 일러스트 일부를 보고 니케 이름을 맞혀 보세요.</p>
+      <QuizGame initialType={type === "illust" ? "illust" : "silhouette"} />
+    </main>
   );
 }

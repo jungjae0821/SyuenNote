@@ -32,8 +32,8 @@ export default function Home() {
         </Row>
       ))}
       <Row title="이름 맞추기 퀴즈">
-        <Tile wide href="/quiz" name="실루엣" detail="그림자만 보고 니케 이름 맞추기" />
-        <Tile wide href="/quiz" name="일러스트" detail="일러스트 일부를 보고 이름 맞추기" />
+        <Tile wide href="/quiz?type=silhouette" name="실루엣" detail="그림자만 보고 니케 이름 맞추기" />
+        <Tile wide href="/quiz?type=illust" name="일러스트"detail="일러스트 일부를 보고 이름 맞추기" />
       </Row>
     </main>
   );

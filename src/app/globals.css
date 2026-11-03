@@ -1,0 +1,149 @@
+@import "tailwindcss";
+
+/* 슈엔노트 토큰. 값과 이유는 DESIGN.md에 있다. */
+:root {
+  --ground: #130e1d;
+  --raise: #1d1629;
+  --raise-2: #2a2039;
+  --line: #3a2f4c;
+  --ink: #f5f1fb;
+  --ink-2: #b2a8c4;
+  --violet: #a97cff;
+  --violet-deep: #5b2fc9;
+  --ssr: #f2c357;
+  --sr: #a97cff;
+  --r: #9fb2c6;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  color-scheme: dark;
+}
+
+@theme inline {
+  --color-ground: var(--ground);
+  --color-raise: var(--raise);
+  --color-raise-2: var(--raise-2);
+  --color-line: var(--line);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-violet: var(--violet);
+  --color-violet-deep: var(--violet-deep);
+  --color-ssr: var(--ssr);
+  --color-sr: var(--sr);
+  --color-r: var(--r);
+  --font-sans: var(--font-pretendard), system-ui, sans-serif;
+}
+
+body {
+  background: var(--ground);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.55;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: var(--violet-deep);
+  color: var(--ink);
+}
+
+/* base 레이어에 두어야 유틸리티(예: 상세 페이지 스펙 칸)가 포커스 표시를 옮길 수 있다. */
+@layer base {
+  :focus-visible {
+    outline: 2px solid var(--violet);
+    outline-offset: 3px;
+  }
+}
+
+html {
+  scrollbar-color: var(--raise-2) var(--ground);
+}
+
+/* 타이틀 월: 줄(.rail)이나 도감 격자(.wall)에서 가리킨 타일 하나만 떠오른다.
+   나머지를 흐리게 하면 스크롤하는 동안 커서가 지나가는 줄 전체가 어두워져서 쓰지 않는다. */
+.rail {
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+}
+.rail::-webkit-scrollbar {
+  display: none;
+}
+:is(.rail, .wall) > .tile {
+  transition:
+    transform 0.35s var(--ease-out),
+    box-shadow 0.35s var(--ease-out);
+}
+:is(.rail, .wall) > .tile:hover,
+:is(.rail, .wall) > .tile:focus-visible {
+  transform: scale(1.06);
+  box-shadow:
+    0 0 0 2px var(--violet),
+    0 18px 30px -12px rgb(0 0 0 / 0.7);
+  outline: none;
+  z-index: 1;
+}
+:is(.rail, .wall) > .tile .tile-detail {
+  opacity: 0;
+  transform: translateY(4px);
+  transition:
+    opacity 0.3s var(--ease-out),
+    transform 0.3s var(--ease-out);
+}
+:is(.rail, .wall) > .tile:hover .tile-detail,
+:is(.rail, .wall) > .tile:focus-visible .tile-detail {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :is(.rail, .wall) > .tile,
+  :is(.rail, .wall) > .tile .tile-detail {
+    transition: none;
+  }
+  :is(.rail, .wall) > .tile:hover,
+  :is(.rail, .wall) > .tile:focus-visible {
+    transform: none;
+  }
+}
+
+@media (hover: none) {
+  :is(.rail, .wall) > .tile .tile-detail {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* 가챠 결과 카드: 뒷면으로 시작해 차례로 뒤집힌다. 지연 시간은 카드마다 인라인으로 준다. */
+.gacha-card {
+  position: relative;
+  transform-style: preserve-3d;
+  animation: gacha-flip 0.6s var(--ease-out) both;
+}
+.gacha-face,
+.gacha-back {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+}
+.gacha-back {
+  transform: rotateY(180deg);
+}
+.gacha-face.is-ssr {
+  box-shadow:
+    0 0 0 2px var(--ssr),
+    0 10px 28px -8px rgb(242 195 87 / 0.6);
+}
+@keyframes gacha-flip {
+  from {
+    transform: rotateY(180deg);
+  }
+  to {
+    transform: rotateY(0deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .gacha-card {
+    animation: none;
+  }
+}

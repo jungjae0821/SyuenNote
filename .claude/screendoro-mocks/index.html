@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>슈엔노트 시안 비교</title>
+<style>
+body{margin:0;font-family:system-ui,sans-serif;background:#1b1622;color:#eee}
+.tabs{display:flex;gap:8px;padding:12px 16px;flex-wrap:wrap}
+.tabs button{background:#2b2336;color:#ddd;border:1px solid #4a3d5c;border-radius:8px;padding:10px 14px;font:inherit;text-align:left;cursor:pointer;max-width:340px}
+.tabs button[aria-selected=true]{background:#5b21d4;color:#fff;border-color:#5b21d4}
+.tabs b{display:block;font-size:15px}.tabs small{font-size:12px;opacity:.85}
+iframe{width:100%;height:calc(100vh - 110px);border:0;background:#fff}
+</style>
+</head>
+<body>
+<div class="tabs" role="tablist">
+  <button role="tab" aria-selected="true" data-src="option-a.html"><b>A · 보랏빛 집무실</b><small>슈엔의 CEO 집무실: 짙은 벨벳 보라 + 금박. 장점: 슈엔 분위기가 가장 강함. 위험: 어둡고 무게감이 있어 가벼운 놀이 느낌은 약함.</small></button>
+  <button role="tab" aria-selected="false" data-src="option-b.html"><b>B · 카드 바인더</b><small>밝은 라벤더 종이 + 진보라 헤더, SSR은 홀로 포일 카드. 장점: 수집·가챠 재미가 직관적. 위험: 슈엔다움보다 "카드 게임" 느낌.</small></button>
+  <button role="tab" aria-selected="false" data-src="option-c.html"><b>C · 타이틀 월</b><small>OTT식 검은 배경, 니케 이미지 타일이 색을 채움, 보라는 포커스에만. 장점: 이미지가 주인공. 위험: 흔한 스트리밍 느낌, 이미지가 없으면 비어 보임.</small></button>
+</div>
+<iframe id="f" src="option-a.html" title="시안 미리보기"></iframe>
+<script>
+document.querySelectorAll('[role=tab]').forEach(b=>b.onclick=()=>{document.querySelectorAll('[role=tab]').forEach(x=>x.setAttribute('aria-selected',x===b));document.getElementById('f').src=b.dataset.src;});
+</script>
+</body>
+</html>

@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>C · 타이틀 월</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<style>
+:root{--ground:#0d0c11;--raise:#17151e;--ink:#f4f1fa;--ink-2:#a59fb4;--focus:#a77bff;--ssr:#f0c45a;--sr:#a77bff}
+*{box-sizing:border-box;margin:0}
+body{background:var(--ground);color:var(--ink);font-family:"Pretendard Variable",Pretendard,system-ui,sans-serif;font-size:15px;line-height:1.5}
+header{position:absolute;top:0;left:0;right:0;display:flex;align-items:center;gap:28px;padding:18px 40px;z-index:5;background:linear-gradient(#0d0c11cc,transparent)}
+.logo{font-weight:900;font-size:22px;letter-spacing:-.03em}
+.logo b{color:var(--focus)}
+header nav{display:flex;gap:22px}
+header nav a{color:var(--ink-2);text-decoration:none;font-weight:700}
+header nav a[aria-current]{color:var(--ink)}
+.login{margin-left:auto;border:0;background:var(--ink);color:#120f19;border-radius:8px;padding:9px 14px;font:inherit;font-weight:800}
+.hero{height:520px;position:relative;display:flex;align-items:flex-end;padding:0 40px 56px;background:radial-gradient(120% 90% at 75% 30%,#3b2366,#16111f 60%,var(--ground))}
+.hero .art{position:absolute;right:8%;top:90px;width:300px;height:360px;border-radius:12px;background:#2a1b45;display:grid;place-items:center;color:var(--ink-2);font-size:13px}
+.hero h1{font-size:56px;font-weight:900;letter-spacing:-.035em;line-height:1.05;max-width:12ch}
+.hero p{color:var(--ink-2);margin-top:10px;font-size:17px}
+.hero .chips{display:flex;gap:8px;margin-top:14px}
+.chip{font-size:12px;font-weight:800;padding:4px 9px;border-radius:6px;background:#ffffff1a}
+.chip.ssr{background:var(--ssr);color:#1a1205}
+.btns{display:flex;gap:10px;margin-top:22px}
+.btn{padding:13px 22px;border-radius:8px;border:0;font:inherit;font-weight:800;font-size:16px}
+.btn.primary{background:var(--ink);color:#120f19}.btn.ghost{background:#ffffff26;color:var(--ink)}
+section.row{padding:26px 0 6px 40px}
+.row h2{font-size:19px;font-weight:800;margin-bottom:12px}
+.rail{display:flex;gap:12px;overflow-x:auto;padding:10px 40px 18px 0;scroll-snap-type:x mandatory;scrollbar-width:none}
+.tile{flex:0 0 170px;aspect-ratio:2/3;border-radius:8px;background:var(--raise);position:relative;scroll-snap-align:start;transition:transform .35s cubic-bezier(.16,1,.3,1),opacity .3s;outline:none}
+.tile .ph{position:absolute;inset:0;display:grid;place-items:center;color:#5b546b;font-size:12px}
+.tile .info{position:absolute;left:0;right:0;bottom:0;padding:10px;background:linear-gradient(transparent,#0d0c11f0);border-radius:0 0 8px 8px}
+.tile .name{font-weight:800}
+.tile .meta{font-size:12px;color:var(--ink-2)}
+.tile .r{position:absolute;top:8px;left:8px;font-size:11px;font-weight:900;color:var(--ssr)}
+.tile .r.sr{color:var(--sr)}
+.rail:hover .tile{opacity:.55}
+.rail .tile:hover,.rail .tile:focus-visible{opacity:1;transform:scale(1.07);box-shadow:0 0 0 2px var(--focus),0 18px 30px -12px #000}
+.note{padding:20px 40px 40px;font-size:12px;color:var(--ink-2)}
+.tabbar{display:none}
+@media (max-width:820px){
+ header{padding:14px 16px}header nav{display:none}
+ .hero{height:460px;padding:0 16px 32px}.hero .art{right:16px;top:70px;width:150px;height:200px}
+ .hero h1{font-size:36px}
+ section.row{padding-left:16px}.rail{padding-right:16px}.tile{flex-basis:120px}
+ .note{padding:16px 16px 96px}
+ .tabbar{display:grid;grid-template-columns:repeat(4,1fr);position:fixed;bottom:0;left:0;right:0;background:#0d0c11f2;border-top:1px solid #ffffff14;padding:10px 0 16px}
+ .tabbar a{text-align:center;color:var(--ink-2);text-decoration:none;font-weight:700;font-size:13px}
+ .tabbar a[aria-current]{color:var(--ink)}
+}
+</style>
+</head>
+<body>
+<header>
+  <span class="logo">슈엔<b>노트</b></span>
+  <nav aria-label="주 메뉴"><a href="#">도감</a><a href="#" aria-current="page">가챠</a><a href="#">퀴즈</a><a href="#">내 정보</a></nav>
+  <button class="login">디스코드 로그인</button>
+</header>
+<div class="hero">
+  <div class="art">일러스트 자리</div>
+  <div>
+    <h1>슈엔 픽업 모집</h1>
+    <p>미시리스 인더스트리 · 버스트 III · 화력형</p>
+    <div class="chips"><span class="chip ssr">SSR 4%</span><span class="chip">픽업 2%</span><span class="chip">마일리지 200회</span></div>
+    <div class="btns"><button class="btn primary">10회 모집</button><button class="btn ghost">1회 모집</button></div>
+  </div>
+</div>
+<section class="row">
+  <h2>최근 모집에서 만난 니케</h2>
+  <div class="rail">
+    <div class="tile" tabindex="0"><span class="ph">이미지</span><span class="r">SSR</span><div class="info"><div class="name">슈엔</div><div class="meta">3분 전 · 124번째</div></div></div>
+    <div class="tile" tabindex="0"><span class="ph">이미지</span><span class="r sr">SR</span><div class="info"><div class="name">네온</div><div class="meta">3분 전</div></div></div>
+    <div class="tile" tabindex="0"><span class="ph">이미지</span><span class="r">SSR</span><div class="info"><div class="name">라피</div><div class="meta">어제</div></div></div>
+    <div class="tile" tabindex="0"><span class="ph">이미지</span><span class="r">SSR</span><div class="info"><div class="name">레드 후드</div><div class="meta">3일 전</div></div></div>
+    <div class="tile" tabindex="0"><span class="ph">이미지</span><span class="r sr">SR</span><div class="info"><div class="name">아니스</div><div class="meta">3일 전</div></div></div>
+    <div class="tile" tabindex="0"><span class="ph">이미지</span><span class="r sr">SR</span><div class="info"><div class="name">델타</div><div class="meta">1주 전</div></div></div>
+  </div>
+</section>
+<section class="row">
+  <h2>도감 · 미시리스 인더스트리</h2>
+  <div class="rail">
+    <div class="tile" tabindex="0"><span class="ph">이미지</span><span class="r">SSR</span><div class="info"><div class="name">슈엔</div><div class="meta">화력형 · AR</div></div></div>
+    <div class="tile" tabindex="0"><span class="ph">이미지</span><span class="r">SSR</span><div class="info"><div class="name">맥스웰</div><div class="meta">화력형 · SR</div></div></div>
+    <div class="tile" tabindex="0"><span class="ph">이미지</span><span class="r">SSR</span><div class="info"><div class="name">리타</div><div class="meta">방어형 · SMG</div></div></div>
+    <div class="tile" tabindex="0"><span class="ph">이미지</span><span class="r">SSR</span><div class="info"><div class="name">드레이크</div><div class="meta">화력형 · SG</div></div></div>
+  </div>
+</section>
+<p class="note">시안용 예시 데이터입니다. 실제 화면은 니케 이미지가 타일을 채웁니다.</p>
+<nav class="tabbar" aria-label="하단 메뉴"><a href="#">도감</a><a href="#" aria-current="page">가챠</a><a href="#">퀴즈</a><a href="#">내 정보</a></nav>
+</body>
+</html>

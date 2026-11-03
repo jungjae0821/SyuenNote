@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>B · 카드 바인더</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&display=swap" rel="stylesheet">
+<style>
+:root{--paper:#f3eff8;--sheet:#ffffff;--violet:#5b21d4;--violet-ink:#2b0f6b;--lilac:#e4d9f7;--ink:#1d1430;--ink-2:#5c5070;--pocket:#ebe4f5;--ssr:#c98a00}
+*{box-sizing:border-box;margin:0}
+body{background:var(--paper);color:var(--ink);font-family:"Pretendard Variable",Pretendard,system-ui,sans-serif;font-size:15px;line-height:1.55}
+header{background:var(--violet);color:#fff}
+.bar{max-width:1180px;margin:0 auto;display:flex;align-items:center;gap:32px;padding:0 24px;height:64px}
+.logo{font-family:"Black Han Sans",sans-serif;font-size:26px;letter-spacing:-.01em}
+header nav{display:flex;gap:4px;height:100%}
+header nav a{display:flex;align-items:center;padding:0 16px;color:#e6dcff;text-decoration:none;font-weight:700;border-bottom:3px solid transparent}
+header nav a[aria-current]{color:#fff;border-color:#fff}
+.login{margin-left:auto;background:#fff;color:var(--violet-ink);border:0;border-radius:999px;padding:9px 16px;font:inherit;font-weight:800}
+main{max-width:1180px;margin:0 auto;padding:32px 24px 64px;display:grid;grid-template-columns:1fr 340px;gap:28px}
+h1{font-family:"Black Han Sans",sans-serif;font-size:40px;font-weight:400;letter-spacing:-.01em;line-height:1.15}
+.lede{color:var(--ink-2);margin-top:6px}
+.binder{background:var(--sheet);border-radius:16px;padding:22px;margin-top:22px;box-shadow:0 10px 30px -18px rgba(43,15,107,.45)}
+.binder header{background:none;color:var(--ink);display:flex;justify-content:space-between;align-items:baseline;margin-bottom:16px}
+.binder h2{font-size:18px;font-weight:800}
+.binder a{color:var(--violet);font-weight:700;text-decoration:none;font-size:14px}
+.pockets{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.card{aspect-ratio:3/4;border-radius:10px;background:var(--pocket);position:relative;display:flex;flex-direction:column;justify-content:flex-end;padding:10px;overflow:hidden;transition:transform .4s cubic-bezier(.2,.8,.2,1)}
+.card.ssr{background:linear-gradient(135deg,#d9c6ff,#ffe6a8 45%,#b9f0ff 70%,#e3c9ff);}
+.card.ssr::after{content:"";position:absolute;inset:6px;border-radius:7px;background:var(--lilac)}
+.card>*{position:relative;z-index:1}
+.card .name{font-weight:800}
+.card .meta{font-size:12px;color:var(--ink-2)}
+.card .rank{position:absolute;top:10px;left:10px;font-family:"Black Han Sans";font-size:15px;color:var(--ssr)}
+.card .rank.sr{color:var(--violet)}
+.card:hover{transform:translateY(-4px) rotate(-1deg)}
+.empty{border:2px dashed #cdbfe6;background:none;display:grid;place-items:center;color:var(--ink-2);font-size:13px}
+aside{display:grid;gap:18px;align-content:start}
+.box{background:var(--sheet);border-radius:16px;padding:20px}
+.box h2{font-size:17px;font-weight:800}
+.pickup{background:var(--violet-ink);color:#fff}
+.pickup p{color:#cdbfff;font-size:14px;margin-top:4px}
+.pickup .art{height:120px;border-radius:10px;background:#3d1c8f;margin:14px 0;display:grid;place-items:center;color:#cdbfff;font-size:13px}
+.row{display:flex;gap:8px}
+.btn{flex:1;padding:11px;border-radius:10px;border:0;font:inherit;font-weight:800;background:#fff;color:var(--violet-ink)}
+.btn.ghost{background:transparent;color:#fff;box-shadow:inset 0 0 0 1.5px #8d6bff}
+dl{display:grid;grid-template-columns:1fr auto;gap:8px 12px;margin-top:12px;font-variant-numeric:tabular-nums}
+dt{color:var(--ink-2)} dd{font-weight:800;text-align:right}
+.note{grid-column:1/-1;font-size:12px;color:var(--ink-2)}
+.tabbar{display:none}
+@media (max-width:820px){
+ header nav{display:none}.bar{height:56px;padding:0 16px}.logo{font-size:22px}
+ main{grid-template-columns:1fr;padding:20px 16px 96px}
+ h1{font-size:30px}
+ .pockets{grid-template-columns:repeat(3,1fr);gap:10px}
+ .tabbar{display:grid;grid-template-columns:repeat(4,1fr);position:fixed;left:12px;right:12px;bottom:12px;background:var(--violet-ink);border-radius:16px;padding:10px 0}
+ .tabbar a{color:#bfaef0;text-align:center;font-weight:700;font-size:13px;text-decoration:none}
+ .tabbar a[aria-current]{color:#fff}
+}
+</style>
+</head>
+<body>
+<header><div class="bar">
+  <span class="logo">슈엔노트</span>
+  <nav aria-label="주 메뉴"><a href="#">도감</a><a href="#" aria-current="page">가챠</a><a href="#">퀴즈</a><a href="#">내 정보</a></nav>
+  <button class="login">디스코드 로그인</button>
+</div></header>
+<main>
+  <div>
+    <h1>내 바인더에 모인 니케</h1>
+    <p class="lede">시뮬에서 뽑은 SSR이 한 장씩 꽂힙니다. 퀴즈로 맞춘 니케도 함께.</p>
+    <section class="binder">
+      <header><h2>최근 획득 · 6장</h2><a href="#">바인더 전체 보기</a></header>
+      <div class="pockets">
+        <div class="card ssr"><span class="rank">SSR</span><span class="name">슈엔</span><span class="meta">미시리스 · 버스트 III</span></div>
+        <div class="card ssr"><span class="rank">SSR</span><span class="name">라피</span><span class="meta">엘리시온 · 버스트 III</span></div>
+        <div class="card"><span class="rank sr">SR</span><span class="name">네온</span><span class="meta">엘리시온 · 버스트 III</span></div>
+        <div class="card ssr"><span class="rank">SSR</span><span class="name">레드 후드</span><span class="meta">필그림 · 버스트 ∞</span></div>
+        <div class="card"><span class="rank sr">SR</span><span class="name">아니스</span><span class="meta">테트라 · 버스트 III</span></div>
+        <div class="card empty">빈 포켓</div>
+        <div class="card empty">빈 포켓</div>
+        <div class="card empty">빈 포켓</div>
+      </div>
+    </section>
+  </div>
+  <aside>
+    <section class="box pickup">
+      <h2>슈엔 픽업 모집</h2>
+      <p>SSR 4% · 픽업 2% · 마일리지 200회</p>
+      <div class="art">일러스트 자리</div>
+      <div class="row"><button class="btn">10회 모집</button><button class="btn ghost">1회</button></div>
+    </section>
+    <section class="box">
+      <h2>내 모집 통계</h2>
+      <dl><dt>누적 모집</dt><dd>124회</dd><dt>SSR</dt><dd>6명</dd><dt>소모 쥬얼</dt><dd>37,200</dd><dt>마일리지</dt><dd>124 / 200</dd></dl>
+    </section>
+    <section class="box">
+      <h2>오늘의 퀴즈</h2>
+      <p class="lede">실루엣만 보고 맞춰 보세요. 10문제 · 4지선다</p>
+    </section>
+  </aside>
+  <p class="note">시안용 예시 데이터입니다.</p>
+</main>
+<nav class="tabbar" aria-label="하단 메뉴"><a href="#">도감</a><a href="#" aria-current="page">가챠</a><a href="#">퀴즈</a><a href="#">내 정보</a></nav>
+</body>
+</html>

@@ -59,4 +59,5 @@ export type GameProfile = {
   team: number[];
 };
 
-export type OwnedCharacter = { id: number; lv: number; grade: number; core: number; combat: number };
+// costume은 입고 있는 코스튬 id(0이면 기본).
+export type OwnedCharacter = { id: number; lv: number; grade: number; core: number; combat: number; costume: number };

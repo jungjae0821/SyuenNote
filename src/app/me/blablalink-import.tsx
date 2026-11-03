@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { NikkeImage } from "@/components/nikke-image";
-import { nikkeImageUrl, nikkes } from "@/data/nikkes";
+import { wornImageUrl } from "@/data/costumes";
+import { nikkes } from "@/data/nikkes";
 import { type GameProfile, type LinkStatus, parseProfileId, serverNames } from "@/lib/blablalink";
 
 export type Player = { openid: string; fetchedAt: string; profile: GameProfile };
@@ -134,6 +135,7 @@ export function BlablalinkImport({
         },
       ].filter((item) => item.value)
     : [];
+  const costumeOf = new Map(shownPlayer?.profile.characters.map((item) => [item.id, item.costume]));
   const squad = (shownPlayer?.profile.team ?? []).flatMap((id) => nikkes.find((nikke) => nikke.id === id) ?? []);
 
   return (
@@ -251,7 +253,7 @@ export function BlablalinkImport({
                     {squad.map((nikke) => (
                       <li key={nikke.id} className="relative aspect-[2/3] overflow-hidden rounded-lg bg-raise-2">
                         <NikkeImage
-                          src={nikkeImageUrl(nikke)}
+                          src={wornImageUrl(nikke, costumeOf.get(nikke.id))}
                           alt=""
                           className="absolute inset-0 size-full object-cover"
                           fallback={

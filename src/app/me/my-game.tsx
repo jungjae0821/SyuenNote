@@ -3,7 +3,8 @@
 import { useState, useSyncExternalStore } from "react";
 import { NikkeImage } from "@/components/nikke-image";
 import { rarityColor } from "@/components/title-wall";
-import { manufacturers, type Nikke, nikkeImageUrl, nikkes } from "@/data/nikkes";
+import { wornImageUrl } from "@/data/costumes";
+import { manufacturers, type Nikke, nikkes } from "@/data/nikkes";
 import type { OwnedCharacter } from "@/lib/blablalink";
 import { BlablalinkImport, type Player } from "./blablalink-import";
 
@@ -293,7 +294,7 @@ function OwnedTile({
     >
       <NikkeImage
         lazy
-        src={nikkeImageUrl(nikke)}
+        src={wornImageUrl(nikke, growth?.costume)}
         alt=""
         className={`absolute inset-0 size-full object-cover transition-opacity ${on ? "" : "opacity-35 grayscale"}`}
         fallback={

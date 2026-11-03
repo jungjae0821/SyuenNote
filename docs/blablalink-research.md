@@ -151,6 +151,8 @@ blablalink 자체 이용약관은 이번 조사에서 찾지 못했다. 사이�
        - `core`: 코어 강화 단계. `grade`가 3인 SSR에서만 0이 아닌 값이 나왔다(이 계정은 최대 3). 게임 최대치 7은 응답으로 확인하지 못했고 게임 규칙을 따랐다.
        - `lv`: 니케 레벨. 싱크로 디바이스에 올린 니케는 모두 같은 값(이 계정 358), 나머지는 1이 많다.
        - `combat`: 니케 한 명의 전투력.
+       - `costume_id`: 입고 있는 코스튬. 캐릭터 목록 JSON의 `costumes[].id`(예: 엠마 30016, 40001)와 같은 체계로 보고, 0이면 기본으로 다룬다. 실제 값이 이 체계인지는 응답 값으로 아직 대조하지 않았다.
+     - 코스튬 이미지: 니케 상세 페이지(`/shiftyspad/nikke?nikke=<resource_id>`)의 코스튬 카드가 `alt="<resource_id>_<코스튬 id>_<순번>"`으로 해시 이미지 경로를 보여 준다. 코스튬이 있는 116명을 돌아 187벌을 `src/data/costumes.ts`에 모았다 (2026-11-03).
      - `basic_info.profile_team`: 배열이 아니라 **JSON 문자열**이다. 예: `'[{"name_code":1021,"slot":1},…,{"name_code":0,"slot":0}]'`. `slot` 1~5가 프로필 대표 스쿼드 칸이고 순서가 섞여 올 수 있다. `slot 0`/`name_code 0`은 빈 칸이다.
      - `basic_info`에는 그 밖에 `corporation_character_counts, progress_{elysion,missilis,tetra,pilgrim}_tower, sim_room_overclock_*, icon_id, role_name` 등이 있다. 슈엔노트는 쓰지 않는다(`currencies`도 넣지 않는다).
      - 비로그인이면 둘 다 `300001 game not login`. 로그인한 상태에서 `GetUserGamePlayerInfo`도 code 0이 된다.

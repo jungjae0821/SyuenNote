@@ -91,7 +91,7 @@ export async function fetchGameProfile(openid: string, area: string): Promise<Ga
   const owned = list.flatMap((item) => {
     const id = nikkeIdByNameCode[number(item.name_code)];
     return id
-      ? [{ id, lv: number(item.lv), grade: number(item.grade), core: number(item.core), combat: number(item.combat) }]
+      ? [{ id, lv: number(item.lv), grade: number(item.grade), core: number(item.core), combat: number(item.combat), costume: number(item.costume_id) }]
       : [];
   });
 

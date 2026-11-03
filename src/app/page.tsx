@@ -1,43 +1,17 @@
 import Link from "next/link";
-import type { ReactNode } from "react";
+import { type ReactNode, Suspense } from "react";
 import { HeroCarousel } from "@/components/hero-carousel";
 import { NikkeImage } from "@/components/nikke-image";
-import { Row, Tile } from "@/components/title-wall";
+import { NowBoard, NowBoardSkeleton } from "@/components/now-board";
 import { manufacturers, type Nikke, nikkeImageUrl, nikkes } from "@/data/nikkes";
-import { dexHref } from "./dex/filters";
 
 export default function Home() {
   return (
     <main>
       <Hero />
-      {manufacturers.map((maker) => (
-        <Row
-          key={maker}
-          title={maker}
-          action={
-            <Link href={dexHref("maker", maker)} className="-my-3 shrink-0 py-3 text-sm font-bold text-ink-2 hover:text-ink">
-              도감에서 보기
-            </Link>
-          }
-        >
-          {nikkes
-            .filter((nikke) => nikke.manufacturer === maker)
-            .map((nikke) => (
-              <Tile
-                key={nikke.id}
-                href={`/dex/${nikke.id}`}
-                name={nikke.name}
-                rarity={nikke.rarity}
-                detail={`${nikke.class} · ${nikke.weapon} · 버스트 ${nikke.burst}`}
-                image={nikkeImageUrl(nikke)}
-              />
-            ))}
-        </Row>
-      ))}
-      <Row title="이름 맞추기 퀴즈">
-        <Tile wide href="/quiz?type=silhouette" name="실루엣" detail="그림자만 보고 니케 이름 맞추기" />
-        <Tile wide href="/quiz?type=illust" name="일러스트"detail="일러스트 일부를 보고 이름 맞추기" />
-      </Row>
+      <Suspense fallback={<NowBoardSkeleton />}>
+        <NowBoard />
+      </Suspense>
     </main>
   );
 }

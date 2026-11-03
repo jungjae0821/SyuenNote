@@ -168,13 +168,15 @@ export function GachaSim() {
               </select>
             </label>
           )}
-          <button
-            type="button"
-            onClick={() => setWishlistDialog({ notice: false })}
-            className="min-h-11 rounded-lg border border-line px-4 text-sm font-extrabold hover:border-violet"
-          >
-            위시리스트 {wishlistReady ? "수정" : "지정"}
-          </button>
+          {kind === "normal" && (
+            <button
+              type="button"
+              onClick={() => setWishlistDialog({ notice: false })}
+              className="min-h-11 rounded-lg border border-line px-4 text-sm font-extrabold hover:border-violet"
+            >
+              위시리스트 {wishlistReady ? "수정" : "지정"}
+            </button>
+          )}
         </div>
 
         <p className="mt-3 text-sm text-ink-2">

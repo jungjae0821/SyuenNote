@@ -114,7 +114,7 @@ function OwnedNikkes({
   const [query, setQuery] = useState("");
   const [rarity, setRarity] = useState<(typeof rarities)[number] | null>(null);
   const [ownedFilter, setOwnedFilter] = useState<(typeof ownedFilters)[number]>("전체");
-  const [sort, setSort] = useState<(typeof sorts)[number]>("도감순");
+  const [sort, setSort] = useState<(typeof sorts)[number]>("전투력순");
 
   const ownedSet = new Set(owned);
   const needle = normalize(query);

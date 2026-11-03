@@ -7,6 +7,7 @@ import { wornImageUrl } from "@/data/costumes";
 import { manufacturers, type Nikke, nikkes } from "@/data/nikkes";
 import type { OwnedCharacter } from "@/lib/blablalink";
 import { BlablalinkImport, type Player } from "./blablalink-import";
+import { NikkeDetailDialog } from "./nikke-detail";
 
 type GameData = { player: Player | null; owned: number[] };
 
@@ -93,6 +94,7 @@ export function MyGame() {
         owned={game.owned}
         characters={game.player?.profile.characters ?? []}
         locked={Boolean(game.player?.profile)}
+        fetchedAt={game.player?.fetchedAt ?? ""}
         onChange={(update) => setStoredGame({ ...getGame(), owned: update(getGame().owned) })}
       />
     </>
@@ -104,17 +106,20 @@ function OwnedNikkes({
   owned,
   characters,
   locked,
+  fetchedAt,
   onChange,
 }: {
   owned: number[];
   characters: OwnedCharacter[];
   locked: boolean;
+  fetchedAt: string;
   onChange: (update: (owned: number[]) => number[]) => void;
 }) {
   const [query, setQuery] = useState("");
   const [rarity, setRarity] = useState<(typeof rarities)[number] | null>(null);
   const [ownedFilter, setOwnedFilter] = useState<(typeof ownedFilters)[number]>("전체");
   const [sort, setSort] = useState<(typeof sorts)[number]>("전투력순");
+  const [opened, setOpened] = useState<Nikke | null>(null);
 
   const ownedSet = new Set(owned);
   const needle = normalize(query);
@@ -153,7 +158,7 @@ function OwnedNikkes({
           </h2>
           <p className="mt-1 text-sm text-ink-2">
             {locked
-              ? "blablalink에서 불러온 보유 목록입니다. 바뀌었다면 위에서 다시 불러오세요."
+              ? "blablalink에서 불러온 보유 목록입니다. 니케를 누르면 장비·스킬 같은 상세 정보를 봅니다."
               : "가진 니케를 눌러 표시합니다. 다시 누르면 해제됩니다."}
           </p>
         </div>
@@ -235,12 +240,21 @@ function OwnedNikkes({
                 on={ownedSet.has(nikke.id)}
                 growth={growth.get(nikke.id)}
                 onToggle={locked ? undefined : () => toggle(nikke.id)}
+                onOpen={locked && ownedSet.has(nikke.id) ? () => setOpened(nikke) : undefined}
               />
             </li>
           ))}
         </ul>
       ) : (
         <p className="mt-2 rounded-lg bg-raise-2 p-5 text-ink-2">조건에 맞는 니케가 없습니다.</p>
+      )}
+      {opened && (
+        <NikkeDetailDialog
+          nikke={opened}
+          growth={growth.get(opened.id)}
+          fetchedAt={fetchedAt}
+          onClose={() => setOpened(null)}
+        />
       )}
     </section>
   );
@@ -279,17 +293,21 @@ function OwnedTile({
   on,
   growth,
   onToggle,
+  onOpen,
 }: {
   nikke: Nikke;
   on: boolean;
   growth?: OwnedCharacter;
   // 없으면 게임에서 불러온 목록이라 눌러도 바뀌지 않는다.
   onToggle?: () => void;
+  // 게임에서 불러온 목록에서는 누르면 상세를 연다.
+  onOpen?: () => void;
 }) {
-  const Tag = onToggle ? "button" : "div";
+  const Tag = onToggle || onOpen ? "button" : "div";
   return (
     <Tag
       {...(onToggle && { type: "button" as const, "aria-pressed": on, onClick: onToggle })}
+      {...(onOpen && { type: "button" as const, "aria-haspopup": "dialog" as const, onClick: onOpen })}
       className={`relative block aspect-[2/3] w-full overflow-hidden rounded-lg bg-raise-2 text-left outline-offset-2 ${on ? "ring-2 ring-violet" : ""}`}
     >
       <NikkeImage

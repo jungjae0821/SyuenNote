@@ -61,3 +61,22 @@ export type GameProfile = {
 
 // costume은 입고 있는 코스튬 id(0이면 기본).
 export type OwnedCharacter = { id: number; lv: number; grade: number; core: number; combat: number; costume: number };
+
+// 니케 한 명의 상세(GetUserCharacterDetails). 니케를 열 때만 불러온다.
+// 응답 중 의미를 확인한 값만 담는다. 옵션 수치(function_value)와 장비 제조사 보너스는 단위·대응을 확인하지 못해 넣지 않는다.
+export type NikkeDetail = {
+  skills: { skill1: number; skill2: number; burst: number };
+  // 하모니 큐브 레벨. 큐브 종류 이름은 대응표가 없어 넣지 않는다.
+  cubeLevel: number | null;
+  favoriteItemLevel: number | null;
+  bondLevel: number;
+  equips: EquipSlot[];
+};
+
+export type EquipSlot = {
+  slot: "head" | "torso" | "arm" | "leg";
+  tier: number;
+  level: number;
+  // 오버로드 옵션. type은 응답의 function_type 그대로, level은 옵션 단계(1~15).
+  options: { type: string; level: number }[];
+} | null;

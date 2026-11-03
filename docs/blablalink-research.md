@@ -156,8 +156,31 @@ blablalink 자체 이용약관은 이번 조사에서 찾지 못했다. 사이�
      - `basic_info.profile_team`: 배열이 아니라 **JSON 문자열**이다. 예: `'[{"name_code":1021,"slot":1},…,{"name_code":0,"slot":0}]'`. `slot` 1~5가 프로필 대표 스쿼드 칸이고 순서가 섞여 올 수 있다. `slot 0`/`name_code 0`은 빈 칸이다.
      - `basic_info`에는 그 밖에 `corporation_character_counts, progress_{elysion,missilis,tetra,pilgrim}_tower, sim_room_overclock_*, icon_id, role_name` 등이 있다. 슈엔노트는 쓰지 않는다(`currencies`도 넣지 않는다).
      - 비로그인이면 둘 다 `300001 game not login`. 로그인한 상태에서 `GetUserGamePlayerInfo`도 code 0이 된다.
+     - **니케 상세 (장비·오버로드·스킬·큐브·소장품) (2026-11-03, 프론트 코드와 운영 계정 세션 1회 호출로 확인, 구현하지 않음):**
+       - `POST /api/game/proxy/Game/GetUserCharacterDetails`. 몸통 `{"intl_open_id", "nikke_area_id", "name_codes": [1021, 5177, …]}`. **여러 명을 배열로 한 번에 받는다.** 시프티패드 화면은 니케를 열 때 아직 안 받은 니케만 골라 그때그때 부른다(150명 LRU 캐시). 배열 길이 상한은 확인하지 않았다.
+       - 프론트에서 `GetUserProfileBasicInfo`, `GetUserCharacters`(코드 안 이름 `API_TOOLS_GET_PLAYER_NIKKES`)와 함께 "로그인과 공개 설정이 필요한 API" 목록에 들어 있다. 시프티패드 공개 설정의 "나의 니케"를 따르는 것으로 보인다.
+       - 비로그인: `300001 game not login`. 운영 계정 세션으로는 연결된 프로필의 니케 2명이 code 0으로 왔다(대표 스쿼드에 있는 니케와 일치). 몸통이 대상 `intl_open_id`를 받고 프론트도 남의 시프티패드를 볼 때 같은 몸통을 쓴다. 다만 이번 확인도 운영 계정과 연결 프로필이 다른 사람인지는 따로 확인하지 않았다.
+       - 응답 `{character_details: [...], state_effects: [...]}`. `character_details[]` 한 명의 필드:
+         - 기본: `name_code, lv, grade, core, combat, costume_tid, attractive_lv(호감도)`. 같은 니케(1021)가 `GetUserCharacters`에서는 `lv 358`, 여기서는 `lv 1`로 왔다. 프론트는 이 값을 `sychro_level`로 이름만 바꿔 쓴다. 의미는 더 확인해야 한다. 프론트는 `limit_break = grade + core`로 계산한다(돌파·코어 해석과 일치).
+         - 스킬: `skill1_lv, skill2_lv, ulti_skill_lv`(버스트).
+         - 큐브: `harmony_cube_tid, harmony_cube_lv`, 아레나용 `arena_harmony_cube_tid, arena_harmony_cube_lv`, `arena_combat`.
+         - 소장품: `favorite_item_tid, favorite_item_lv`.
+         - 장비 4칸 `head/torso/arm/leg` 각각: `*_equip_tid, *_equip_lv(강화 0~5), *_equip_tier(예: 10), *_equip_corporation_type(제조사 보너스), *_equip_option1_id ~ option3_id`(오버로드 옵션, 0이면 빈 칸).
+       - 오버로드 옵션 id(예 `7000709`): 프론트는 `id % 100`(1~15)을 옵션 단계로 본다. 종류와 수치는 같은 응답의 `state_effects[]`에 옵션 id별로 온다: `{id: "7001201", function_details: [{function_type: "StatCriticalDamage", function_value: 664, function_value_type: "Integer", level, …}]}`. `function_value`는 664 = 6.64%로 보이나 단위는 확인하지 않았다. 옵션 이름은 프론트가 CDN의 옵션 표(`getEquipOptionsMap`)에서 붙인다. 장비 이름·티어 정보도 CDN 표(`getEquipData`)에서 온다.
+       - 동기화 요청 수: 한 번에 받을 수 있다면 기존 2건에 1건이 늘어난다(보유 니케 전체를 `name_codes`로). 상한이 있으면 그만큼 나눠 보내야 한다. 다만 지금 원칙(새 API 요청을 늘리지 않음)에 어긋나므로 넣으려면 판단이 필요하다.
+       - 추가 확인 (2026-11-03): 보유 니케 2명은 code 0이었지만, 보유 니케 9명 + 미보유로 보이는 1명(5005)을 보내자 `1301008 param invalid`가 왔다. 미보유 니케 때문인지 개수 상한 때문인지는 가리지 않았다.
+       - **슈엔노트 적용 (사용자 결정 "니케 열 때만 불러오기"):** 새 요청은 이것 하나만 쓴다. 동기화 때는 부르지 않고, 내 정보의 보유 니케(게임에서 불러온 목록)를 눌렀을 때 그 니케 한 명만 `name_codes: [하나]`로 부른다 (`src/app/api/blablalink/character/route.ts`).
+         - 라우트는 연결·인증된 본인 프로필만 조회한다. 요청으로는 `nameCode` 하나만 받고, `src/data/name-codes.ts`에 있는 값만 허용한다. 미보유 니케는 0이 아닌 코드나 빈 결과로 오므로 `not-owned`(404)로 돌려준다.
+         - 간격 제한: 사용자마다 2초, 서버 전체 0.5초. 간격 안에 온 요청은 거절하지 않고 차례까지 기다렸다 보낸다(6초 넘게 밀릴 때만 거절). 1300015가 오면 `too-frequent`(429). 브라우저는 같은 니케를 다시 열면 메모리 캐시를 쓰고, 진행 중인 같은 요청은 하나로 합친다(개발 모드에서 effect가 두 번 돌아 두 번째 요청이 간격 제한에 걸리던 문제).
+         - 브라우저로 보내는 값: 스킬 레벨 3개, 하모니 큐브 레벨, 소장품 레벨, 호감도, 장비 4칸의 티어·강화 단계·오버로드 옵션(종류 `function_type`, 단계 `level`).
+         - 넣지 않은 값: 옵션 수치(`function_value`, 단위 미확인), 장비 제조사 보너스(`*_corporation_type`, 값 대응 미확인), 큐브 종류(`harmony_cube_tid` 이름 대응 없음), `lv`(의미 미확인), 아레나 큐브.
+         - 이름 표: blablalink CDN의 옵션·장비 표(`equip_option_table_v2-ko.json`, `ItemEquipTable-ko.json`)는 경로를 프론트 코드가 난독화해서 만든다. 경로를 얻으려면 그 규칙을 풀어야 해서(역설계 금지 조항) 쓰지 않는다. 대신 응답에 같이 오는 `function_type`을 키로 우리 대응표(`src/app/me/nikke-detail.tsx`)를 둔다. 응답에서 직접 본 것은 `StatCriticalDamage`뿐이고, 표에 없는 값은 원래 문자열 그대로 보인다.
      - 그 밖에 시프티패드가 부르는 것: `GetSavedRoleInfo`, `GetUserProfileOutpostInfo`, `GetUserDailyContentsProgress`, `GetMyGuildInfo {target_intl_open_id, target_nikke_area_id}`, `GetGuildDetail`, `GetGuildMembers`.
      - 몸통이 대상 ID를 받는 구조라 로그인한 계정으로 남의 정보를 보는 용도로 보이지만, **다른 사람 계정으로는 확인하지 않았다.**
+     - **스테이지 클리어 기록 (2026-11-03, 사용자 본인 계정으로 확인): 운영 계정 방식으로는 쓸 수 없다.**
+       - 시프티패드 홈의 "스테이지 클리어 기록"은 `GetMainQuestClearLineup {stage_id, area_id}`(캠페인)로 온다. 응답은 `{cleared_at(유닉스 초 문자열), list: [{slot, tid, lv, combat}]}`. 챕터별 클리어한 스테이지 목록은 `GetLevelCompletionRecordsByChapter {chapter_id, area_id}` → `stage_ids`. 그 밖에 `GetCampaignStageCharacterInfo`가 있다. 자주 부르면 `1300015 Requests are too frequent`가 온다.
+       - 몸통에 대상 계정 ID가 없다. `intl_open_id`, `target_intl_open_id`에 없는 값("1")을 넣어 보내도 무시되고 로그인한 계정 자신의 기록이 그대로 왔다. 즉 **로그인한 본인 기록만 볼 수 있고**, 운영 계정 세션으로 부르면 운영 계정의 기록이 나온다.
+       - 사용자 쿠키를 받지 않는 지금 방식에서는 다른 사용자의 클리어 기록을 가져올 방법이 없어 넣지 않았다.
    - 남은 리스크: 공개 정보라도 자동으로 가져오는 것은 EULA 7항(데이터 수집 도구)에 걸릴 여지가 있다. 계정 공유 문제는 없어졌다.
 
 ### (c) 공개 배포 체크리스트

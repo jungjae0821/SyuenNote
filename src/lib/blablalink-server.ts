@@ -1,6 +1,6 @@
 import "server-only";
 import { nikkeIdByNameCode } from "@/data/name-codes";
-import type { GameProfile } from "./blablalink";
+import type { EquipSlot, GameProfile, NikkeDetail } from "./blablalink";
 import { decryptSession } from "./session-crypto";
 import { createAdminClient } from "./supabase/admin";
 
@@ -135,6 +135,55 @@ function teamIds(value: unknown): number[] {
       return id ? [id] : [];
     })
     .slice(0, 5);
+}
+
+// 니케 한 명의 상세 (2026-11-03 확인). 몸통에 name_codes 배열을 받지만 니케를 열 때 한 명씩만 보낸다.
+// 미보유 니케를 섞어 보내면 1301008(param invalid)이 오는 것으로 보여, 0이 아닌 코드는 "not-owned"로 다룬다.
+export async function fetchNikkeDetail(openid: string, area: string, nameCode: number): Promise<NikkeDetail> {
+  const cookie = await botCookie();
+  const result = await call(
+    "game/proxy/Game/GetUserCharacterDetails",
+    { intl_open_id: openid.replace(/^\d+-/, ""), nikke_area_id: Number(area), name_codes: [nameCode] },
+    { cookie, shiftyspad: true },
+  );
+  if (result.code === 300001) throw new BlablalinkError("bot-session-expired");
+  if (result.code === 1300015) throw new BlablalinkError("too-frequent");
+  const data = result.data as
+    | { character_details?: Record<string, unknown>[]; state_effects?: { id?: unknown; function_details?: Record<string, unknown>[] }[] }
+    | undefined;
+  const detail = data?.character_details?.find((item) => number(item.name_code) === nameCode);
+  if (result.code !== 0 || !detail) throw new BlablalinkError("not-owned");
+
+  // 옵션 id → 첫 효과의 종류와 단계. 단계는 응답의 level을 쓴다(프론트도 id % 100을 단계로 본다).
+  const effects = new Map(
+    (data?.state_effects ?? []).map((effect) => {
+      const first = effect.function_details?.[0];
+      return [
+        number(effect.id),
+        { type: typeof first?.function_type === "string" ? first.function_type : "", level: number(first?.level) || number(effect.id) % 100 },
+      ];
+    }),
+  );
+  const equips = (["head", "torso", "arm", "leg"] as const).map((slot): EquipSlot => {
+    if (!number(detail[`${slot}_equip_tid`])) return null;
+    return {
+      slot,
+      tier: number(detail[`${slot}_equip_tier`]),
+      level: number(detail[`${slot}_equip_lv`]),
+      options: [1, 2, 3].flatMap((index) => {
+        const effect = effects.get(number(detail[`${slot}_equip_option${index}_id`]));
+        return effect?.type ? [effect] : [];
+      }),
+    };
+  });
+
+  return {
+    skills: { skill1: number(detail.skill1_lv), skill2: number(detail.skill2_lv), burst: number(detail.ulti_skill_lv) },
+    cubeLevel: number(detail.harmony_cube_tid) ? number(detail.harmony_cube_lv) : null,
+    favoriteItemLevel: number(detail.favorite_item_tid) ? number(detail.favorite_item_lv) : null,
+    bondLevel: number(detail.attractive_lv),
+    equips,
+  };
 }
 
 // 세션은 요청마다 DB에서 암호문을 읽어 메모리에서만 푼다. 모듈 변수에 남기지 않는다.

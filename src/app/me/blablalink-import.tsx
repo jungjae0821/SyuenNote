@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { NikkeImage } from "@/components/nikke-image";
+import { nikkeImageUrl, nikkes } from "@/data/nikkes";
 import { type GameProfile, type LinkStatus, parseProfileId, serverNames } from "@/lib/blablalink";
 
 export type Player = { openid: string; fetchedAt: string; profile: GameProfile };
@@ -132,6 +134,7 @@ export function BlablalinkImport({
         },
       ].filter((item) => item.value)
     : [];
+  const squad = (shownPlayer?.profile.team ?? []).flatMap((id) => nikkes.find((nikke) => nikke.id === id) ?? []);
 
   return (
     <section aria-labelledby="import-title" aria-busy={!link} className="rounded-xl bg-raise p-5 md:col-span-2">
@@ -241,6 +244,30 @@ export function BlablalinkImport({
                   </div>
                 ))}
               </dl>
+              {squad.length > 0 && (
+                <div className="mt-5">
+                  <h3 className="text-sm font-bold text-ink-2">대표 스쿼드</h3>
+                  <ul className="mt-2 grid max-w-md grid-cols-5 gap-2">
+                    {squad.map((nikke) => (
+                      <li key={nikke.id} className="relative aspect-[2/3] overflow-hidden rounded-lg bg-raise-2">
+                        <NikkeImage
+                          src={nikkeImageUrl(nikke)}
+                          alt=""
+                          className="absolute inset-0 size-full object-cover"
+                          fallback={
+                            <span aria-hidden="true" className="absolute inset-x-1 top-2 text-sm leading-none font-black text-raise">
+                              {nikke.name}
+                            </span>
+                          }
+                        />
+                        <span className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-ground to-transparent px-1 pt-4 pb-1 text-[10px] leading-tight font-bold md:text-xs">
+                          <span className="line-clamp-2">{nikke.name}</span>
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
               <p className="mt-3 text-xs text-ink-2">
                 {new Date(shownPlayer.fetchedAt).toLocaleString("ko-KR")}에 불러옴. 아래 보유 니케에도 반영했습니다.
               </p>

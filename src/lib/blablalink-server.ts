@@ -86,9 +86,14 @@ export async function fetchGameProfile(openid: string, area: string): Promise<Ga
     string,
     unknown
   >;
-  const list = ((characters.data as { characters?: { name_code?: unknown }[] } | undefined)?.characters ?? []);
-  const number = (value: unknown) => (typeof value === "number" ? value : Number(value) || 0);
+  const list = ((characters.data as { characters?: Record<string, unknown>[] } | undefined)?.characters ?? []);
   const created = number(info.created_at);
+  const owned = list.flatMap((item) => {
+    const id = nikkeIdByNameCode[number(item.name_code)];
+    return id
+      ? [{ id, lv: number(item.lv), grade: number(item.grade), core: number(item.core), combat: number(item.combat) }]
+      : [];
+  });
 
   // 응답 전체를 넘기지 않고 쓰는 값만 골라 보낸다.
   return {
@@ -99,11 +104,37 @@ export async function fetchGameProfile(openid: string, area: string): Promise<Ga
     costumeCount: number(info.character_costume_count),
     tribeTower: number(info.progress_tribe_tower),
     createdAt: created ? new Date(created * 1000).toISOString() : null,
-    owned: list.flatMap((item) => {
+    owned: owned.map((item) => item.id),
+    characters: owned,
+    team: teamIds(info.profile_team),
+  };
+}
+
+function number(value: unknown) {
+  return typeof value === "number" ? value : Number(value) || 0;
+}
+
+// profile_team은 '[{"name_code":1021,"slot":1},...]' 같은 JSON 문자열이다 (2026-11-03 확인).
+// 슬롯 1~5 순서로 놓고, 빈 칸(name_code 0, slot 0)은 뺀다. 모양이 달라도 빈 목록이 되게 한다.
+function teamIds(value: unknown): number[] {
+  let items: unknown = value;
+  if (typeof value === "string") {
+    try {
+      items = JSON.parse(value);
+    } catch {
+      return [];
+    }
+  }
+  if (!Array.isArray(items)) return [];
+  return items
+    .map((item) => item as { name_code?: unknown; slot?: unknown })
+    .filter((item) => number(item?.slot) > 0)
+    .sort((a, b) => number(a.slot) - number(b.slot))
+    .flatMap((item) => {
       const id = nikkeIdByNameCode[number(item.name_code)];
       return id ? [id] : [];
-    }),
-  };
+    })
+    .slice(0, 5);
 }
 
 // 세션은 요청마다 DB에서 암호문을 읽어 메모리에서만 푼다. 모듈 변수에 남기지 않는다.

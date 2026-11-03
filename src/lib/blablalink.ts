@@ -53,4 +53,10 @@ export type GameProfile = {
   createdAt: string | null;
   // 도감 id(src/data/nikkes.ts)로 바꾼 보유 니케
   owned: number[];
+  // 니케별 육성 상태. id는 도감 id. grade는 한계 돌파 횟수, core는 코어 강화 단계.
+  characters: OwnedCharacter[];
+  // 프로필에 걸어 둔 대표 스쿼드(도감 id, 최대 5명)
+  team: number[];
 };
+
+export type OwnedCharacter = { id: number; lv: number; grade: number; core: number; combat: number };

@@ -146,6 +146,13 @@ blablalink 자체 이용약관은 이번 조사에서 찾지 못했다. 사이�
      - `POST /api/game/proxy/Game/GetUserProfileBasicInfo`, `.../GetUserCharacters`. 몸통 `{"intl_open_id": "<29080- 뒤 숫자>", "nikke_area_id": 81}`. `x-common-params`는 `game_id "16"`, `intl_game_id "29080"`, `area_id "global"`.
      - `basic_info`: `nickname, lv(지휘관 레벨), team_combat(스쿼드 전투력), character_count, character_costume_count, progress_tribe_tower, created_at(유닉스 초), progress_*_campaign, currencies, profile_team` 등.
      - `characters[]`: `name_code, lv, grade, core, combat, costume_id`. `name_code`는 캐릭터 목록 JSON과 1:1이라 `src/data/name-codes.ts`로 도감 id에 잇는다.
+     - 필드 의미 (2026-11-03, 사용자 본인 계정 156명으로 확인):
+       - `grade`: 한계 돌파 횟수. SSR 0~3, SR은 2(최대), R은 0만 나왔다.
+       - `core`: 코어 강화 단계. `grade`가 3인 SSR에서만 0이 아닌 값이 나왔다(이 계정은 최대 3). 게임 최대치 7은 응답으로 확인하지 못했고 게임 규칙을 따랐다.
+       - `lv`: 니케 레벨. 싱크로 디바이스에 올린 니케는 모두 같은 값(이 계정 358), 나머지는 1이 많다.
+       - `combat`: 니케 한 명의 전투력.
+     - `basic_info.profile_team`: 배열이 아니라 **JSON 문자열**이다. 예: `'[{"name_code":1021,"slot":1},…,{"name_code":0,"slot":0}]'`. `slot` 1~5가 프로필 대표 스쿼드 칸이고 순서가 섞여 올 수 있다. `slot 0`/`name_code 0`은 빈 칸이다.
+     - `basic_info`에는 그 밖에 `corporation_character_counts, progress_{elysion,missilis,tetra,pilgrim}_tower, sim_room_overclock_*, icon_id, role_name` 등이 있다. 슈엔노트는 쓰지 않는다(`currencies`도 넣지 않는다).
      - 비로그인이면 둘 다 `300001 game not login`. 로그인한 상태에서 `GetUserGamePlayerInfo`도 code 0이 된다.
      - 그 밖에 시프티패드가 부르는 것: `GetSavedRoleInfo`, `GetUserProfileOutpostInfo`, `GetUserDailyContentsProgress`, `GetMyGuildInfo {target_intl_open_id, target_nikke_area_id}`, `GetGuildDetail`, `GetGuildMembers`.
      - 몸통이 대상 ID를 받는 구조라 로그인한 계정으로 남의 정보를 보는 용도로 보이지만, **다른 사람 계정으로는 확인하지 않았다.**
